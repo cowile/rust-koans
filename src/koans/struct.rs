@@ -71,6 +71,7 @@ fn revoking_mutability() {
 // There may be cases where you want to create a new instance of a Struct
 // that is only slightly different from an existing one
 #[test]
+#[allow(dead_code)]
 fn dot_merging() {
     struct Account {
         holder: &'static str,
