@@ -15,7 +15,7 @@ fn implementing_traits() {
         fn full_name(&self) -> String;
     }
 
-    impl Person {
+    impl HasName for Person {
         fn full_name(&self) -> String {
             format!("{} {}", self.first_name, self.last_name)
         }
@@ -40,6 +40,7 @@ fn implementing_traits() {
 // This is required in order to guarantee that any type that shares that trait
 // will be able to respond to those functions.
 #[test]
+#[allow(dead_code)]
 fn implementing_traits2() {
     struct Character {
         name: &'static str,
@@ -57,6 +58,7 @@ fn implementing_traits2() {
             self.level += 1;
             self.level
         }
+	fn print_level(&self) {}
     }
 
     let mut durz = Character {
@@ -77,6 +79,16 @@ fn creating_traits() {
     let num_one: u16 = 3;
     let num_two: u16 = 4;
 
+    trait IsEvenOrOdd {
+          fn is_even(&self) -> bool;
+    }
+
+    impl IsEvenOrOdd for u16 {
+         fn is_even(&self) -> bool {
+	    self % 2 == 0
+	 }
+    }
+
     fn asserts<T: IsEvenOrOdd>(x: T, y: T) {
         assert!(!x.is_even());
         assert!(y.is_even());
@@ -94,7 +106,7 @@ fn trait_constraints_on_structs() {
         latest_version: T,
     }
 
-    impl<__> Language<T> {
+    impl<T: std::cmp::PartialOrd> Language<T> {
         fn is_stable(&self) -> bool {
             self.latest_version >= self.stable_version
         }
@@ -125,7 +137,7 @@ fn where_clause() {
         }
     }
 
-    fn asserts<T>(x: T, y: T) {
+    fn asserts<T: IsEvenOrOdd>(x: T, y: T) {
         assert!(!x.is_even());
         assert!(y.is_even());
     }
@@ -142,15 +154,16 @@ fn default_functions() {
 
     trait IsEvenOrOdd {
         fn is_even(&self) -> bool;
-        fn is_odd(&self) -> bool {
-            __
-        }
+        fn is_odd(&self) -> bool;
     }
 
     impl IsEvenOrOdd for u16 {
         fn is_even(&self) -> bool {
             self % 2 == 0
         }
+	fn is_odd(&self) -> bool {
+	    self % 2 == 1
+	}
     }
 
     fn asserts<T: IsEvenOrOdd>(x: T, y: T) {
@@ -176,7 +189,18 @@ fn inheritance() {
 
     impl<T: PartialOrd> PartialOrd for Bawks<T> {
         fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-            __
+           if self.thingy < other.thingy {
+              Some(Ordering::Less)
+           }
+           else if self.thingy > other.thingy {
+              Some(Ordering::Greater)
+           }
+           else if self.thingy == other.thingy {
+              Some(Ordering::Equal)
+           }
+           else {
+              None
+           }
         }
     }
 
